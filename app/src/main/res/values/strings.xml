@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Ceep</string>
+    <string name="botao_salvar_titulo">Salva Nota</string>
 </resources>

@@ -14,7 +14,7 @@ import com.example.ceep.model.Nota;
 
 import java.util.List;
 
-public class ListaNotasAdapter extends RecyclerView.Adapter {
+public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.NotaViewHolder> {
     private final List<Nota> notas;
 
     public ListaNotasAdapter(List<Nota> notas) {
@@ -23,19 +23,16 @@ public class ListaNotasAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ListaNotasAdapter.NotaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View viewCriada = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_nota, parent, false);
         return new NotaViewHolder(viewCriada);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListaNotasAdapter.NotaViewHolder holder, int position) {
         Nota nota = notas.get(position);
-        TextView tituloTextView = holder.itemView.findViewById(R.id.item_nota_titulo);
-        TextView descricaoTextView = holder.itemView.findViewById(R.id.item_nota_descricao);
-        tituloTextView.setText(nota.getTitulo());
-        descricaoTextView.setText(nota.getDescricao());
+        holder.vincula(nota);
     }
 
     @Override
@@ -43,9 +40,20 @@ public class ListaNotasAdapter extends RecyclerView.Adapter {
         return notas.size();
     }
 
-    public class NotaViewHolder extends RecyclerView.ViewHolder {
+    public static class NotaViewHolder extends RecyclerView.ViewHolder {
+        private final TextView tituloTextView;
+        private final TextView descricaoTextView;
+
+
         public NotaViewHolder(View itemView) {
             super(itemView);
+            tituloTextView = itemView.findViewById(R.id.item_nota_titulo);
+            descricaoTextView = itemView.findViewById(R.id.item_nota_descricao);
+        }
+
+        public void vincula(Nota nota){
+            tituloTextView.setText(nota.getTitulo());
+            descricaoTextView.setText(nota.getDescricao());
         }
 
     }

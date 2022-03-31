@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ceep">
         <activity
+            android:name=".NovaNotaActivity"
+            android:exported="false" />
+        <activity
             android:name=".NoteListActivity"
             android:exported="true">
             <intent-filter>
