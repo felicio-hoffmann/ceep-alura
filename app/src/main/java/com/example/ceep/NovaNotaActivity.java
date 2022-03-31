@@ -3,6 +3,7 @@ package com.example.ceep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.Menu;
@@ -34,7 +35,9 @@ public class NovaNotaActivity extends AppCompatActivity {
             EditText descricao = findViewById(R.id.formulario_nota_descricao);
             EditText titulo = findViewById(R.id.formulario_nota_titulo);
             Nota novaNota = new Nota(titulo.getText().toString(), descricao.getText().toString());
-            new NotaDAO().insere(novaNota);
+            Intent resultado = new Intent();
+            resultado.putExtra("nota", novaNota);
+            setResult(2, resultado);
             finish();
         }
         return super.onOptionsItemSelected(item);
