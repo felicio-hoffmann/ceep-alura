@@ -1,9 +1,10 @@
 package com.example.ceep;
 
 import android.os.Bundle;
-import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ceep.dao.NotaDAO;
 import com.example.ceep.model.Nota;
@@ -18,13 +19,18 @@ public class NoteListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
 
-        ListView listaNotas = findViewById(R.id.listView);
+        RecyclerView listaNotas = findViewById(R.id.recylerview_lista_notas);
 
         NotaDAO dao = new NotaDAO();
-        dao.insere(new Nota("Primeira nota",
-                "Primeira descrição"));
+        for (int i = 1; i < 10001; i++){
+            dao.insere(new Nota("Nota " + i,
+                    "Descrição " + i));
+        }
+
         List<Nota> todasNotas = dao.todos();
 
-        listaNotas.setAdapter(new ListaNotasAdapter(this, todasNotas));
+        listaNotas.setAdapter(new ListaNotasAdapter(todasNotas));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        listaNotas.setLayoutManager(linearLayoutManager);
     }
 }

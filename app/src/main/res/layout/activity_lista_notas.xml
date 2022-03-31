@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".NoteListActivity">
 
-    <ListView
-        android:id="@+id/listView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recylerview_lista_notas"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/lista_notas_insere_nota"
@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lista_notas_insere_nota"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
