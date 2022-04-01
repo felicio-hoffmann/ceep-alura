@@ -1,5 +1,6 @@
 package com.example.ceep.activity;
 
+import static com.example.ceep.activity.Constantes.CHAVE_NOTA;
 import static com.example.ceep.activity.Constantes.CODIGO_REQUISICAO_NOVA_NOTA;
 import static com.example.ceep.activity.Constantes.CODIGO_RESULTADO_NOTA_CRIADA;
 
@@ -16,7 +17,7 @@ import com.example.ceep.R;
 import com.example.ceep.dao.NotaDAO;
 import com.example.ceep.model.Nota;
 import com.example.ceep.ui.adapter.ListaNotasAdapter;
-import com.example.ceep.ui.adapter.OnItemClickListener;
+import com.example.ceep.ui.adapter.listener.OnItemClickListener;
 
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class ListaNotasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista_notas);
 
         NotaDAO dao = new NotaDAO();
+        for (int i = 0; i < 10; i++) {
+            dao.insere(new Nota("Titulo " + (i+1), "Descrição " + (i+1)));
+        }
         List<Nota> todasNotas = dao.todos();
         configuraRecyclerView(todasNotas);
         TextView insereNota = findViewById(R.id.lista_notas_insere_nota);
@@ -47,10 +51,17 @@ public class ListaNotasActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CODIGO_REQUISICAO_NOVA_NOTA
-                && resultCode == CODIGO_RESULTADO_NOTA_CRIADA && data.hasExtra(getString(R.string.chave_nota))) {
-            Nota nota = (Nota) data.getSerializableExtra(getString(R.string.chave_nota));
+                && resultCode == CODIGO_RESULTADO_NOTA_CRIADA && data.hasExtra(CHAVE_NOTA)) {
+            Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
             new NotaDAO().insere(nota);
             adapter.adiciona(nota);
+        }
+        if (requestCode == 2 && resultCode == CODIGO_RESULTADO_NOTA_CRIADA &&
+                data.hasExtra(CHAVE_NOTA) && data.hasExtra("posicao")) {
+            Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+            int pos = data.getIntExtra("posicao", -1);
+            new NotaDAO().altera(pos, nota);
+            adapter.altera(pos, nota);
         }
     }
 
@@ -60,8 +71,12 @@ public class ListaNotasActivity extends AppCompatActivity {
         listaNotas.setAdapter(adapter);
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick() {
-                Toast.makeText(ListaNotasActivity.this, "teste", Toast.LENGTH_SHORT).show();
+            public void onItemClick(int pos, Nota nota) {
+                Intent vaiParaEdição = new Intent(ListaNotasActivity.this,
+                        NovaNotaActivity.class);
+                vaiParaEdição.putExtra(CHAVE_NOTA, nota);
+                vaiParaEdição.putExtra("posicao", pos);
+                startActivityForResult(vaiParaEdição, 2);
             }
         });
     }

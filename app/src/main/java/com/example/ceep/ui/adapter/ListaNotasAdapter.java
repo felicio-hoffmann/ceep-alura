@@ -1,17 +1,16 @@
 package com.example.ceep.ui.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ceep.R;
 import com.example.ceep.model.Nota;
+import com.example.ceep.ui.adapter.listener.OnItemClickListener;
 
 import java.util.List;
 
@@ -30,7 +29,10 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
                 .inflate(R.layout.item_nota, parent, false);
         return new NotaViewHolder(viewCriada);
     }
-
+    public void altera(int pos, Nota nota){
+        notas.set(pos, nota);
+        notifyDataSetChanged();
+    }
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
@@ -54,6 +56,7 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
     public class NotaViewHolder extends RecyclerView.ViewHolder {
         private final TextView tituloTextView;
         private final TextView descricaoTextView;
+        private Nota nota;
 
 
         public NotaViewHolder(View itemView) {
@@ -63,12 +66,13 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onItemClickListener.onItemClick();
+                    onItemClickListener.onItemClick(getAdapterPosition(), nota);
                 }
             });
         }
 
         public void vincula(Nota nota){
+            this.nota = nota;
             tituloTextView.setText(nota.getTitulo());
             descricaoTextView.setText(nota.getDescricao());
         }
