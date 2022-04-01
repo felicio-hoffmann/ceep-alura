@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.NotaViewHolder> {
     private final List<Nota> notas;
+    private OnItemClickListener onItemClickListener;
 
     public ListaNotasAdapter(List<Nota> notas) {
         this.notas = notas;
@@ -27,6 +29,10 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
         View viewCriada = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_nota, parent, false);
         return new NotaViewHolder(viewCriada);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -45,7 +51,7 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
         notifyDataSetChanged();
     }
 
-    public static class NotaViewHolder extends RecyclerView.ViewHolder {
+    public class NotaViewHolder extends RecyclerView.ViewHolder {
         private final TextView tituloTextView;
         private final TextView descricaoTextView;
 
@@ -54,6 +60,12 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
             super(itemView);
             tituloTextView = itemView.findViewById(R.id.item_nota_titulo);
             descricaoTextView = itemView.findViewById(R.id.item_nota_descricao);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onItemClickListener.onItemClick();
+                }
+            });
         }
 
         public void vincula(Nota nota){

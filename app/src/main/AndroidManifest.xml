@@ -13,7 +13,7 @@
             android:name=".activity.NovaNotaActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.NoteListActivity"
+            android:name=".activity.ListaNotasActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

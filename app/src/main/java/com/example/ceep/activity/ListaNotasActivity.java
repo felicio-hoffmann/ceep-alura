@@ -6,6 +6,7 @@ import static com.example.ceep.activity.Constantes.CODIGO_RESULTADO_NOTA_CRIADA;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,12 +16,11 @@ import com.example.ceep.R;
 import com.example.ceep.dao.NotaDAO;
 import com.example.ceep.model.Nota;
 import com.example.ceep.ui.adapter.ListaNotasAdapter;
+import com.example.ceep.ui.adapter.OnItemClickListener;
 
 import java.util.List;
 
-public class NoteListActivity extends AppCompatActivity {
-
-
+public class ListaNotasActivity extends AppCompatActivity {
     private ListaNotasAdapter adapter;
 
     @Override
@@ -37,11 +37,11 @@ public class NoteListActivity extends AppCompatActivity {
 
     private void configuraNovaNota(TextView insereNota) {
         insereNota.setOnClickListener(view -> {
-            Intent vaiParaNovaNota = new Intent(NoteListActivity.this, NovaNotaActivity.class);
+            Intent vaiParaNovaNota = new Intent(ListaNotasActivity.this, NovaNotaActivity.class);
             startActivityForResult(vaiParaNovaNota, CODIGO_REQUISICAO_NOVA_NOTA);
         });
     }
-    
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -58,5 +58,11 @@ public class NoteListActivity extends AppCompatActivity {
         RecyclerView listaNotas = findViewById(R.id.recylerview_lista_notas);
         adapter = new ListaNotasAdapter(todasNotas);
         listaNotas.setAdapter(adapter);
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick() {
+                Toast.makeText(ListaNotasActivity.this, "teste", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
