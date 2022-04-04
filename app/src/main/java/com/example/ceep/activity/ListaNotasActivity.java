@@ -1,11 +1,15 @@
 package com.example.ceep.activity;
 
 import static com.example.ceep.activity.Constantes.CHAVE_NOTA;
+import static com.example.ceep.activity.Constantes.CHAVE_POSICAO;
+import static com.example.ceep.activity.Constantes.CODIGO_REQUISICAO_ALTERA_NOTA;
 import static com.example.ceep.activity.Constantes.CODIGO_REQUISICAO_NOVA_NOTA;
-import static com.example.ceep.activity.Constantes.CODIGO_RESULTADO_NOTA_CRIADA;
+import static com.example.ceep.activity.Constantes.POSICAO_INVALIDA;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,11 +21,11 @@ import com.example.ceep.R;
 import com.example.ceep.dao.NotaDAO;
 import com.example.ceep.model.Nota;
 import com.example.ceep.ui.adapter.ListaNotasAdapter;
-import com.example.ceep.ui.adapter.listener.OnItemClickListener;
 
 import java.util.List;
 
 public class ListaNotasActivity extends AppCompatActivity {
+
     private ListaNotasAdapter adapter;
 
     @Override
@@ -31,7 +35,7 @@ public class ListaNotasActivity extends AppCompatActivity {
 
         NotaDAO dao = new NotaDAO();
         for (int i = 0; i < 10; i++) {
-            dao.insere(new Nota("Titulo " + (i+1), "Descrição " + (i+1)));
+            dao.insere(new Nota("Titulo " + (i + 1), "Descrição " + (i + 1)));
         }
         List<Nota> todasNotas = dao.todos();
         configuraRecyclerView(todasNotas);
@@ -50,34 +54,49 @@ public class ListaNotasActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CODIGO_REQUISICAO_NOVA_NOTA
-                && resultCode == CODIGO_RESULTADO_NOTA_CRIADA && data.hasExtra(CHAVE_NOTA)) {
-            Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
-            new NotaDAO().insere(nota);
-            adapter.adiciona(nota);
+        if (ehInserenota(requestCode, data)) {
+            if(resultCode == Activity.RESULT_OK) {
+                Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+                new NotaDAO().insere(nota);
+                adapter.adiciona(nota);
+            }
         }
-        if (requestCode == 2 && resultCode == CODIGO_RESULTADO_NOTA_CRIADA &&
-                data.hasExtra(CHAVE_NOTA) && data.hasExtra("posicao")) {
-            Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
-            int pos = data.getIntExtra("posicao", -1);
-            new NotaDAO().altera(pos, nota);
-            adapter.altera(pos, nota);
+        if (ehAlteraNota(requestCode, data)) {
+            if(resultCode == Activity.RESULT_OK) {
+                Nota nota = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+                int pos = data.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
+                if (pos != POSICAO_INVALIDA) {
+                    new NotaDAO().altera(pos, nota);
+                    adapter.altera(pos, nota);
+                } else {
+                    Toast.makeText(this, "Ocorreu um erro na requisição da nota",
+                            Toast.LENGTH_SHORT).show();
+                    Log.e("edit note error", "onActivityResult: ");
+                }
+            }
         }
+    }
+
+    private boolean ehAlteraNota(int requestCode, @Nullable Intent data) {
+        return requestCode == CODIGO_REQUISICAO_ALTERA_NOTA &&
+                data.hasExtra(CHAVE_NOTA);
+    }
+
+    private boolean ehInserenota(int requestCode, @Nullable Intent data) {
+        return requestCode == CODIGO_REQUISICAO_NOVA_NOTA
+                && data.hasExtra(CHAVE_NOTA);
     }
 
     private void configuraRecyclerView(List<Nota> todasNotas) {
         RecyclerView listaNotas = findViewById(R.id.recylerview_lista_notas);
         adapter = new ListaNotasAdapter(todasNotas);
         listaNotas.setAdapter(adapter);
-        adapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(int pos, Nota nota) {
-                Intent vaiParaEdição = new Intent(ListaNotasActivity.this,
-                        NovaNotaActivity.class);
-                vaiParaEdição.putExtra(CHAVE_NOTA, nota);
-                vaiParaEdição.putExtra("posicao", pos);
-                startActivityForResult(vaiParaEdição, 2);
-            }
+        adapter.setOnItemClickListener((pos, nota) -> {
+            Intent vaiParaEdição = new Intent(ListaNotasActivity.this,
+                    NovaNotaActivity.class);
+            vaiParaEdição.putExtra(CHAVE_NOTA, nota);
+            vaiParaEdição.putExtra(CHAVE_POSICAO, pos);
+            startActivityForResult(vaiParaEdição, CODIGO_REQUISICAO_ALTERA_NOTA);
         });
     }
 }

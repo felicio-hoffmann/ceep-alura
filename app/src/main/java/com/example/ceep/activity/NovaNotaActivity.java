@@ -1,14 +1,14 @@
 package com.example.ceep.activity;
 
 import static com.example.ceep.activity.Constantes.CHAVE_NOTA;
-import static com.example.ceep.activity.Constantes.CODIGO_RESULTADO_NOTA_CRIADA;
+import static com.example.ceep.activity.Constantes.CHAVE_POSICAO;
+import static com.example.ceep.activity.Constantes.POSICAO_INVALIDA;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,25 +17,33 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.ceep.R;
 import com.example.ceep.model.Nota;
 
-import java.io.Serializable;
-
 public class NovaNotaActivity extends AppCompatActivity {
 
-    private int posicaoRecebida;
+    private int posicaoRecebida = POSICAO_INVALIDA;
+    private TextView titulo;
+    private TextView descricao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nova_nota);
+        buscaViews();
         Intent intent = getIntent();
-        if (intent.hasExtra(CHAVE_NOTA) && intent.hasExtra("posicao")){
+        if (intent.hasExtra(CHAVE_NOTA)) {
             Nota notaRecebida = (Nota) intent.getSerializableExtra(CHAVE_NOTA);
-            TextView titulo = findViewById(R.id.formulario_nota_titulo);
-            titulo.setText(notaRecebida.getTitulo());
-            TextView descricao = findViewById(R.id.formulario_nota_descricao);
-            posicaoRecebida = intent.getIntExtra("posicao", -1);
-            descricao.setText(notaRecebida.getDescricao());
+            posicaoRecebida = intent.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
+            preencheCampos(notaRecebida);
         }
+    }
+
+    private void preencheCampos(Nota notaRecebida) {
+        titulo.setText(notaRecebida.getTitulo());
+        descricao.setText(notaRecebida.getDescricao());
+    }
+
+    private void buscaViews() {
+        titulo = findViewById(R.id.formulario_nota_titulo);
+        descricao = findViewById(R.id.formulario_nota_descricao);
     }
 
     @Override
@@ -46,7 +54,7 @@ public class NovaNotaActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (menuSalvaNota(item)){
+        if (menuSalvaNota(item)) {
             Nota novaNota = criaNotaComOsCamposPreenchidos();
             retornaNota(novaNota);
             finish();
@@ -58,15 +66,12 @@ public class NovaNotaActivity extends AppCompatActivity {
         Intent resultado = new Intent();
         resultado.putExtra(CHAVE_NOTA, novaNota);
         resultado.putExtra("posicao", posicaoRecebida);
-        setResult(CODIGO_RESULTADO_NOTA_CRIADA, resultado);
+        setResult(Activity.RESULT_OK, resultado);
     }
 
     @NonNull
     private Nota criaNotaComOsCamposPreenchidos() {
-        EditText descricao = findViewById(R.id.formulario_nota_descricao);
-        EditText titulo = findViewById(R.id.formulario_nota_titulo);
-        Nota novaNota = new Nota(titulo.getText().toString(), descricao.getText().toString());
-        return novaNota;
+        return new Nota(titulo.getText().toString(), descricao.getText().toString());
     }
 
     private boolean menuSalvaNota(@NonNull MenuItem item) {
