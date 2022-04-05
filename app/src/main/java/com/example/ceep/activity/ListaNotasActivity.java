@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ceep.R;
 import com.example.ceep.dao.NotaDAO;
+import com.example.ceep.helper.callback.NotaItemCallback;
 import com.example.ceep.model.Nota;
 import com.example.ceep.ui.adapter.ListaNotasAdapter;
 
@@ -33,10 +35,9 @@ public class ListaNotasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
 
+        setTitle("Notas");
+
         NotaDAO dao = new NotaDAO();
-        for (int i = 0; i < 10; i++) {
-            dao.insere(new Nota("Titulo " + (i + 1), "Descrição " + (i + 1)));
-        }
         List<Nota> todasNotas = dao.todos();
         configuraRecyclerView(todasNotas);
         TextView insereNota = findViewById(R.id.lista_notas_insere_nota);
@@ -79,18 +80,19 @@ public class ListaNotasActivity extends AppCompatActivity {
 
     private boolean ehAlteraNota(int requestCode, @Nullable Intent data) {
         return requestCode == CODIGO_REQUISICAO_ALTERA_NOTA &&
-                data.hasExtra(CHAVE_NOTA);
+                data != null && data.hasExtra(CHAVE_NOTA);
     }
 
     private boolean ehInserenota(int requestCode, @Nullable Intent data) {
         return requestCode == CODIGO_REQUISICAO_NOVA_NOTA
-                && data.hasExtra(CHAVE_NOTA);
+                && data != null && data.hasExtra(CHAVE_NOTA);
     }
 
     private void configuraRecyclerView(List<Nota> todasNotas) {
         RecyclerView listaNotas = findViewById(R.id.recylerview_lista_notas);
         adapter = new ListaNotasAdapter(todasNotas);
         listaNotas.setAdapter(adapter);
+
         adapter.setOnItemClickListener((pos, nota) -> {
             Intent vaiParaEdição = new Intent(ListaNotasActivity.this,
                     NovaNotaActivity.class);
@@ -98,5 +100,8 @@ public class ListaNotasActivity extends AppCompatActivity {
             vaiParaEdição.putExtra(CHAVE_POSICAO, pos);
             startActivityForResult(vaiParaEdição, CODIGO_REQUISICAO_ALTERA_NOTA);
         });
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new NotaItemCallback(adapter));
+        itemTouchHelper.attachToRecyclerView(listaNotas);
     }
 }

@@ -29,7 +29,10 @@ public class NovaNotaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nova_nota);
         buscaViews();
         Intent intent = getIntent();
+
+        setTitle("Insere Nota");
         if (intent.hasExtra(CHAVE_NOTA)) {
+            setTitle("Altera Nota");
             Nota notaRecebida = (Nota) intent.getSerializableExtra(CHAVE_NOTA);
             posicaoRecebida = intent.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
             preencheCampos(notaRecebida);
